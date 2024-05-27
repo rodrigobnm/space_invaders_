@@ -156,7 +156,7 @@ void screenGotoxy(int x, int y);
 
 /**
  * Define text colors
- * @param fg foreground color, can assume values from BLACK to WHITE
+ * @param fg foreground color, acan assume values from BLACK to WHITE
  * @param bg background color, can assume values from BLACK to LIGHTGRAY
  */
 void screenSetColor(screenColor fg, screenColor bg);

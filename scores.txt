@@ -1,0 +1,11 @@
+Player: felipe, Score: 0
+Player: Deleto, Score: 80
+Player: felipe, Score: 10
+Player: rodrigo, Score: 0
+Player: R, Score: 0
+Player: Eu, Score: 120
+Player: afdsafdfff, Score: 290
+Player: hole, Score: 120
+Player: AAAAAAAAAA, Score: 40
+Player: AA             , Score: 40
+Player: A, Score: 40
