@@ -7,52 +7,53 @@
 #include <time.h>
 
 // Estruturas para as definições dos elementos
-typedef struct{
+typedef struct {
   int x, y;
-}Position;
+} Posicao;
 
-typedef struct{
-  Position pos;
-}Player;
+typedef struct {
+  Posicao pos;
+} Jogador;
 
-typedef struct{
-  Position pos;
-  int active;
-}Projectile;
+typedef struct {
+  Posicao pos;
+  int ativo;
+} Projetil;
 
-typedef struct{
-  Position pos;
-  int alive;
-}Enemy;
+typedef struct {
+  Posicao pos;
+  int vivo;
+} Inimigo;
 
 // Declarações de função (prototypes)
-void initialize(Player **player, Enemy **enemies, Projectile **playerProjectiles, Projectile **enemyProjectiles);
-void desenho(Player player, Enemy enemies[], Projectile playerProjectiles[], Projectile enemyProjectiles[]);
-void atualiza(Player *player, Enemy enemies[], Projectile playerProjectiles[], Projectile enemyProjectiles[]);
-void acaba();
-void get_player_name();
+void inicializa(Jogador **jogador, Inimigo **inimigos, Projetil **projeteisJogador, Projetil **projeteisInimigo);
+void desenho(Jogador jogador, Inimigo inimigos[], Projetil projeteisJogador[], Projetil projeteisInimigo[]);
+void atualiza(Jogador *jogador, Inimigo inimigos[], Projetil projeteisJogador[], Projetil projeteisInimigo[]);
+void finaliza();
+void pega_nome_jogador();
 void menu();
-void draw_game_over();
-void draw_victory_message();
-void draw_score();
-void save_score();
-void view_ranking();
+void desenha_caractere(int x, int y, char caractere);
+void desenha_game_over();
+void desenha_mensagem_vitoria();
+void desenha_pontuacao();
+void salva_pontuacao();
+void ver_ranking();
 
 // Variáveis globais
-#define ENEMIES_PER_ROW 6
-#define NUM_ROWS 4
-#define NUM_ENEMIES (ENEMIES_PER_ROW * NUM_ROWS)
-#define MAX_PROJECTILES 2
-#define WIDTH 81
-#define HEIGHT 24
+#define INIMIGOS_POR_LINHA 6
+#define NUM_LINHAS 4
+#define NUM_INIMIGOS (INIMIGOS_POR_LINHA * NUM_LINHAS)
+#define MAX_PROJETEIS 2
+#define LARGURA 81
+#define ALTURA 24
 
 // Inicialização de elementos
-int score = 0;
-char playerName[20];
-int enemyMoveTimer = 0;
-int enemyProjectileMoveCounter = 0;
-int enemyDirection = 1;
-time_t lastEnemyMoveTime = 0;
+int pontuacao = 0;
+char nomeJogador[20];
+int timerMovimentoInimigo = 0;
+int contadorMovimentoProjetilInimigo = 0;
+int direcaoInimigo = 1;
+time_t ultimaMovimentacaoInimigo = 0;
 
 int main(){
   screenInit(1);
@@ -60,189 +61,196 @@ int main(){
   keyboardInit(0);
 
   menu();
-  get_player_name();
+  pega_nome_jogador();
 
-  Player *player;
-  Enemy *enemies;
-  Projectile *playerProjectiles;
-  Projectile *enemyProjectiles;
+  Jogador *jogador;
+  Inimigo *inimigos;
+  Projetil *projeteisJogador;
+  Projetil *projeteisInimigo;
 
-  initialize(&player, &enemies, &playerProjectiles, &enemyProjectiles);
+  inicializa(&jogador, &inimigos, &projeteisJogador, &projeteisInimigo);
 
   while (1){
-    desenho(*player, enemies, playerProjectiles, enemyProjectiles);
-    atualiza(player, enemies, playerProjectiles, enemyProjectiles);
+    desenho(*jogador, inimigos, projeteisJogador, projeteisInimigo);
+    atualiza(jogador, inimigos, projeteisJogador, projeteisInimigo);
     usleep(60000);
   }
 
   // Liberar memória alocada dinamicamente
-  free(player);
-  free(enemies);
-  free(playerProjectiles);
-  free(enemyProjectiles);
+  free(jogador);
+  free(inimigos);
+  free(projeteisJogador);
+  free(projeteisInimigo);
 
-  acaba();
+  finaliza();
   return 0;
 }
 
 // Funções do Código:
 
-// Função de inicialização dos elemtnos e do jogo em si
-void initialize(Player **player, Enemy **enemies, Projectile **playerProjectiles, Projectile **enemyProjectiles){
+// Função de inicialização dos elementos e do jogo em si
+void inicializa(Jogador **jogador, Inimigo **inimigos, Projetil **projeteisJogador, Projetil **projeteisInimigo){
 
-  *player = (Player *)malloc(sizeof(Player));
-  (*player)->pos.x = WIDTH / 2;
-  (*player)->pos.y = HEIGHT - 3;
+  *jogador = (Jogador *)malloc(sizeof(Jogador));
+  (*jogador)->pos.x = LARGURA / 2;
+  (*jogador)->pos.y = ALTURA - 3;
 
-  *enemies = (Enemy *)malloc(NUM_ENEMIES * sizeof(Enemy));
-  for (int i = 0; i < NUM_ENEMIES; ++i){
-    (*enemies)[i].pos.x = (i % ENEMIES_PER_ROW + 1) * (WIDTH / (ENEMIES_PER_ROW + 1));
-    (*enemies)[i].pos.y = 3 + (i / ENEMIES_PER_ROW);
-    (*enemies)[i].alive = 1;
+  *inimigos = (Inimigo *)malloc(NUM_INIMIGOS * sizeof(Inimigo));
+  for (int i = 0; i < NUM_INIMIGOS; ++i){
+    (*inimigos)[i].pos.x = (i % INIMIGOS_POR_LINHA + 1) * (LARGURA / (INIMIGOS_POR_LINHA + 1));
+    (*inimigos)[i].pos.y = 3 + (i / INIMIGOS_POR_LINHA);
+    (*inimigos)[i].vivo = 1;
   }
 
-  *playerProjectiles = (Projectile *)malloc(MAX_PROJECTILES * sizeof(Projectile));
-  *enemyProjectiles = (Projectile *)malloc(MAX_PROJECTILES * sizeof(Projectile));
+  *projeteisJogador = (Projetil *)malloc(MAX_PROJETEIS * sizeof(Projetil));
+  *projeteisInimigo = (Projetil *)malloc(MAX_PROJETEIS * sizeof(Projetil));
 
-  for (int i = 0; i < MAX_PROJECTILES; ++i){
-    (*playerProjectiles)[i].active = 0;
-    (*enemyProjectiles)[i].active = 0;
+  for (int i = 0; i < MAX_PROJETEIS; ++i){
+    (*projeteisJogador)[i].ativo = 0;
+    (*projeteisInimigo)[i].ativo = 0;
   }
-  lastEnemyMoveTime = time(NULL);
+  ultimaMovimentacaoInimigo = time(NULL);
+}
+
+void desenha_caractere(int x, int y, char caractere){
+
+  screenGotoxy(x, y); // Move o cursor para a posição (x, y)
+  putchar(caractere); // Desenha o caractere
 }
 
 // Função de GAME OVER caso jogador seja derrotado
-void draw_game_over(){
+void desenha_game_over(){
 
   screenInit(1);
-  const char *message = "GAME-OVER";
-  int message_length = strlen(message);
-  int start_x = (WIDTH - message_length) / 2;
-  int start_y = HEIGHT / 2;
+  const char *mensagem = "GAME-OVER";
+  int tamanho_mensagem = strlen(mensagem);
+  int inicio_x = (LARGURA - tamanho_mensagem) / 2;
+  int inicio_y = ALTURA / 2;
   screenSetColor(RED, BLACK);
-  for (int i = 0; i < message_length; ++i){
-    draw_char(start_x + i, start_y, message[i]);
+  for (int i = 0; i < tamanho_mensagem; ++i){
+    desenha_caractere(inicio_x + i, inicio_y, mensagem[i]);
   }
 }
 
 // Função para mensagem de Vitória após jogador eliminar todos inimigos
-void draw_victory_message(){
+void desenha_mensagem_vitoria() {
 
   screenInit(1);
-  const char *message = "VOCE VENCEU!";
-  int message_length = strlen(message);
-  int start_x = (WIDTH - message_length) / 2;
-  int start_y = HEIGHT / 2;
+  const char *mensagem = "VOCE VENCEU!";
+  int tamanho_mensagem = strlen(mensagem);
+  int inicio_x = (LARGURA - tamanho_mensagem) / 2;
+  int inicio_y = ALTURA / 2;
   screenSetColor(GREEN, BLACK);
-  for (int i = 0; i < message_length; ++i) {
-    draw_char(start_x + i, start_y, message[i]);
+  for (int i = 0; i < tamanho_mensagem; ++i){
+    desenha_caractere(inicio_x + i, inicio_y, mensagem[i]);
   }
 }
 
 // Função para desenhar a pontuação no topo da tela
-void draw_score(){
+void desenha_pontuacao(){
 
-  char score_str[40];
-  sprintf(score_str, "Score: %d", score);
-  int message_length = strlen(score_str);
-  int start_x = (WIDTH - message_length) / 2;
+  char str_pontuacao[40];
+  sprintf(str_pontuacao, "Score: %d", pontuacao);
+  int tamanho_mensagem = strlen(str_pontuacao);
+  int inicio_x = (LARGURA - tamanho_mensagem) / 2;
   screenSetColor(YELLOW, BLACK);
-  for (int i = 0; i < message_length; ++i){
-    draw_char(start_x + i, 0, score_str[i]);
+  for (int i = 0; i < tamanho_mensagem; ++i){
+    desenha_caractere(inicio_x + i, 0, str_pontuacao[i]);
   }
 }
 
 // Função para definição do formato dos elementos
-void desenho(Player player, Enemy enemies[], Projectile playerProjectiles[], Projectile enemyProjectiles[]){
+void desenho(Jogador jogador, Inimigo inimigos[], Projetil projeteisJogador[], Projetil projeteisInimigo[]) {
 
   screenClear();
   screenInit(1);
   screenSetColor(GREEN, BLACK);
-  draw_char(player.pos.x, player.pos.y, 'W');
+  desenha_caractere(jogador.pos.x, jogador.pos.y, 'W');
 
-  for (int i = 0; i < NUM_ENEMIES; ++i){
-    if (enemies[i].alive) {
-      draw_char(enemies[i].pos.x, enemies[i].pos.y, 'M');
+  for (int i = 0; i < NUM_INIMIGOS; ++i){
+    if (inimigos[i].vivo){
+      desenha_caractere(inimigos[i].pos.x, inimigos[i].pos.y, 'M');
     }
   }
 
-  for (int i = 0; i < MAX_PROJECTILES; ++i){
-    if (playerProjectiles[i].active){
-      draw_char(playerProjectiles[i].pos.x, playerProjectiles[i].pos.y, '!');
+  for (int i = 0; i < MAX_PROJETEIS; ++i){
+    if (projeteisJogador[i].ativo){
+      desenha_caractere(projeteisJogador[i].pos.x, projeteisJogador[i].pos.y, '!');
     }
-    if (enemyProjectiles[i].active){
-      draw_char(enemyProjectiles[i].pos.x, enemyProjectiles[i].pos.y, '!');
+    if (projeteisInimigo[i].ativo){
+      desenha_caractere(projeteisInimigo[i].pos.x, projeteisInimigo[i].pos.y, '!');
     }
   }
 
-  draw_score();
+  desenha_pontuacao();
   screenUpdate();
 }
 
 // Função para salvar a pontuação dos jogadores no arquivo .txt
-void save_score(){
+void salva_pontuacao(){
 
-  FILE *file = fopen("scores.txt", "a");
-  if (file){
-    fprintf(file, "Player: %s, Score: %d\n", playerName, score);
-    fclose(file);
-  } else{
+  FILE *arquivo = fopen("scores.txt", "a");
+  if (arquivo){
+    fprintf(arquivo, "Player: %s, Score: %d\n", nomeJogador, pontuacao);
+    fclose(arquivo);
+  }else{
     printf("Erro ao abrir o arquivo para salvar o score.\n");
   }
 }
 
 // Função para atualização de informações na tela
-void atualiza(Player *player, Enemy enemies[], Projectile playerProjectiles[], Projectile enemyProjectiles[]){
+void atualiza(Jogador *jogador, Inimigo inimigos[], Projetil projeteisJogador[], Projetil projeteisInimigo[]){
 
-  int allEnemiesDead = 1; // Variável para verificar se todos os inimigos estão mortos
+  int todosInimigosMortos =
+      1; // Variável para verificar se todos os inimigos estão mortos
 
-  for (int i = 0; i < MAX_PROJECTILES; ++i){
-    if (playerProjectiles[i].active){
-      playerProjectiles[i].pos.y--;
-      if (playerProjectiles[i].pos.y < 1){
-        playerProjectiles[i].active = 0;
+  for (int i = 0; i < MAX_PROJETEIS; ++i){
+    if (projeteisJogador[i].ativo){
+      projeteisJogador[i].pos.y--;
+      if (projeteisJogador[i].pos.y < 1){
+        projeteisJogador[i].ativo = 0;
       }
 
-      for (int j = 0; j < NUM_ENEMIES; ++j){
-        if (enemies[j].alive && playerProjectiles[i].pos.x == enemies[j].pos.x && playerProjectiles[i].pos.y == enemies[j].pos.y){
-          enemies[j].alive = 0;
-          playerProjectiles[i].active = 0;
-          score = score + 10;
+      for (int j = 0; j < NUM_INIMIGOS; ++j){
+        if (inimigos[j].vivo && projeteisJogador[i].pos.x == inimigos[j].pos.x && projeteisJogador[i].pos.y == inimigos[j].pos.y){
+          inimigos[j].vivo = 0;
+          projeteisJogador[i].ativo = 0;
+          pontuacao = pontuacao + 10;
         }
       }
     }
 
-    if (enemyProjectiles[i].active){
-      if (enemyProjectileMoveCounter % 3 == 0){
-        enemyProjectiles[i].pos.y++;
-        if (enemyProjectiles[i].pos.y >= HEIGHT - 1){
-          enemyProjectiles[i].active = 0;
+    if (projeteisInimigo[i].ativo){
+      if (contadorMovimentoProjetilInimigo % 3 == 0){
+        projeteisInimigo[i].pos.y++;
+        if (projeteisInimigo[i].pos.y >= ALTURA - 1){
+          projeteisInimigo[i].ativo = 0;
         }
 
-        if (enemyProjectiles[i].pos.x == player->pos.x && enemyProjectiles[i].pos.y == player->pos.y){
+        if (projeteisInimigo[i].pos.x == jogador->pos.x && projeteisInimigo[i].pos.y == jogador->pos.y){
           screenClear();
-          draw_game_over();
+          desenha_game_over();
           screenUpdate();
           usleep(3000000);
-          save_score();
+          salva_pontuacao();
           exit(0);
         }
       }
     }
   }
 
-  enemyProjectileMoveCounter++;
+  contadorMovimentoProjetilInimigo++;
 
-  for (int i = 0; i < NUM_ENEMIES; ++i){
-    if (enemies[i].alive){
-      allEnemiesDead = 0; // Se encontrar um inimigo vivo, define como 0
+  for (int i = 0; i < NUM_INIMIGOS; ++i){
+    if (inimigos[i].vivo){
+      todosInimigosMortos = 0; // Se encontrar um inimigo vivo, define como 0
       if (rand() % 100 < 5){
         for (int j = 0; j < 3; ++j){
-          for (int k = 0; k < MAX_PROJECTILES; ++k){
-            if (!enemyProjectiles[k].active){
-              enemyProjectiles[k].pos.x = enemies[i].pos.x;
-              enemyProjectiles[k].pos.y = enemies[i].pos.y + 1;
-              enemyProjectiles[k].active = 1;
+          for (int k = 0; k < MAX_PROJETEIS; ++k){
+            if (!projeteisInimigo[k].ativo){
+              projeteisInimigo[k].pos.x = inimigos[i].pos.x;
+              projeteisInimigo[k].pos.y = inimigos[i].pos.y + 1;
+              projeteisInimigo[k].ativo = 1;
               break;
             }
           }
@@ -251,37 +259,37 @@ void atualiza(Player *player, Enemy enemies[], Projectile playerProjectiles[], P
     }
   }
 
-  if (allEnemiesDead){
+  if (todosInimigosMortos){
     screenClear();
-    draw_victory_message();
+    desenha_mensagem_vitoria();
     screenUpdate();
     usleep(3000000);
-    save_score();
+    salva_pontuacao();
     exit(0);
   }
 
   if (keyhit()){
     int ch = readch();
-    if (ch == 'a' && player->pos.x > 2){
-      player->pos.x--;
+    if (ch == 'a' && jogador->pos.x > 2){
+      jogador->pos.x--;
     }
-    if (ch == 'd' && player->pos.x < WIDTH - 3){
-      player->pos.x++;
+    if (ch == 'd' && jogador->pos.x < LARGURA - 3){
+      jogador->pos.x++;
     }
     if (ch == ' '){
-      int canShoot = 1;
-      for (int i = 0; i < MAX_PROJECTILES; ++i){
-        if (playerProjectiles[i].active){
-          canShoot = 0;
+      int podeAtirar = 1;
+      for (int i = 0; i < MAX_PROJETEIS; ++i){
+        if (projeteisJogador[i].ativo){
+          podeAtirar = 0;
           break;
         }
       }
-      if (canShoot){
-        for (int i = 0; i < MAX_PROJECTILES; ++i){
-          if (!playerProjectiles[i].active){
-            playerProjectiles[i].pos.x = player->pos.x;
-            playerProjectiles[i].pos.y = player->pos.y - 1;
-            playerProjectiles[i].active = 1;
+      if (podeAtirar){
+        for (int i = 0; i < MAX_PROJETEIS; ++i){
+          if (!projeteisJogador[i].ativo) {
+            projeteisJogador[i].pos.x = jogador->pos.x;
+            projeteisJogador[i].pos.y = jogador->pos.y - 1;
+            projeteisJogador[i].ativo = 1;
             break;
           }
         }
@@ -291,39 +299,41 @@ void atualiza(Player *player, Enemy enemies[], Projectile playerProjectiles[], P
 }
 
 // Função para finalizar jogo
-void acaba(){
+void finaliza(){
+
   keyboardDestroy();
   timerDestroy();
   screenDestroy();
 }
 
 // Função para salvar nickname do jogador
-void get_player_name(){
-  const char *message = "Digite seu nome: ";
-  int message_length = strlen(message);
-  int start_x = (WIDTH - message_length) / 2;
-  int start_y = HEIGHT / 2;
+void pega_nome_jogador(){
 
-  for (int i = 0; i < message_length; ++i){
-    draw_char(start_x + i, start_y, message[i]);
+  const char *mensagem = "Digite seu nome: ";
+  int tamanho_mensagem = strlen(mensagem);
+  int inicio_x = (LARGURA - tamanho_mensagem) / 2;
+  int inicio_y = ALTURA / 2;
+
+  for (int i = 0; i < tamanho_mensagem; ++i){
+    desenha_caractere(inicio_x + i, inicio_y, mensagem[i]);
   }
 
   screenUpdate();
 
-  int index = 0;
+  int indice = 0;
   while (1){
     if (keyhit()){
       int ch = readch();
-      if (ch == '\n' || ch == '\r') {
-        playerName[index] = '\0';
+      if (ch == '\n' || ch == '\r'){
+        nomeJogador[indice] = '\0';
         break;
-      }else if (ch == 127 && index > 0){ // 127 em ASCII é caractere backspace
-        index--;
-        draw_char(start_x + message_length + index, start_y, ' ');
+      }else if (ch == 127 && indice > 0){ // 127 em ASCII é caractere backspace
+        indice--;
+        desenha_caractere(inicio_x + tamanho_mensagem + indice, inicio_y, ' ');
         screenUpdate();
-      }else if (index < sizeof(playerName) - 1){
-        playerName[index++] = ch;
-        draw_char(start_x + message_length + index - 1, start_y, ch);
+      }else if (indice < sizeof(nomeJogador) - 1){
+        nomeJogador[indice++] = ch;
+        desenha_caractere(inicio_x + tamanho_mensagem + indice - 1, inicio_y, ch);
         screenUpdate();
       }
     }
@@ -331,39 +341,40 @@ void get_player_name(){
 }
 
 // Função para verificar o score de jogadores na tela
-void view_ranking(){
+void ver_ranking(){
+
   while (1){
     screenClear();
     screenInit(1);
     screenSetColor(GREEN, BLACK);
-    FILE *file = fopen("scores.txt", "r");
-    if (file){
-      char line[100];
+    FILE *arquivo = fopen("scores.txt", "r");
+    if (arquivo){
+      char linha[100];
       int y = 2;
-      while (fgets(line, sizeof(line), file)){
-        for (int i = 0; i < strlen(line); ++i){
-          draw_char(2 + i, y, line[i]);
+      while (fgets(linha, sizeof(linha), arquivo)){
+        for (int i = 0; i < strlen(linha); ++i){
+          desenha_caractere(2 + i, y, linha[i]);
         }
         y++;
       }
-      fclose(file);
+      fclose(arquivo);
     }else{
-      const char *message = "Erro ao abrir o arquivo de scores.";
-      for (int i = 0; i < strlen(message); ++i){
-        draw_char(2 + i, 2, message[i]);
+      const char *mensagem = "Erro ao abrir o arquivo de scores.";
+      for (int i = 0; i < strlen(mensagem); ++i) {
+        desenha_caractere(2 + i, 2, mensagem[i]);
       }
     }
 
-    const char *back_message = "1. Voltar ao Menu";
-    int back_message_length = strlen(back_message);
-    int start_x = (WIDTH - back_message_length) / 2;
-    int start_y = HEIGHT - 2;
-    for (int i = 0; i < back_message_length; ++i){
-      draw_char(start_x + i, start_y, back_message[i]);
+    const char *mensagem_voltar = "1. Voltar ao Menu";
+    int tamanho_mensagem_voltar = strlen(mensagem_voltar);
+    int inicio_x = (LARGURA - tamanho_mensagem_voltar) / 2;
+    int inicio_y = ALTURA - 2;
+    for (int i = 0; i < tamanho_mensagem_voltar; ++i){
+      desenha_caractere(inicio_x + i, inicio_y, mensagem_voltar[i]);
     }
     screenUpdate();
     usleep(400000);
-    if (keyhit()){
+    if (keyhit()) {
       int ch = readch();
       if (ch == '1'){
         break; // Voltar ao menu
@@ -374,17 +385,18 @@ void view_ranking(){
 
 // Função para mostrar menu na tela
 void menu(){
+
   while (1){
     screenClear();
     screenInit(1);
     screenSetColor(GREEN, BLACK);
-    const char *menu_items[] = {"1. Jogar", "2. Ver Ranking", "3. Sair"};
-    int num_items = sizeof(menu_items) / sizeof(menu_items[0]);
-    int start_y = HEIGHT / 2 - num_items;
-    for (int i = 0; i < num_items; ++i){
-      int start_x = (WIDTH - strlen(menu_items[i])) / 2;
-      for (int j = 0; j < strlen(menu_items[i]); ++j){
-        draw_char(start_x + j, start_y + i, menu_items[i][j]);
+    const char *itens_menu[] = {"1. Jogar", "2. Ver Pontuacoes", "3. Sair"};
+    int num_itens = sizeof(itens_menu) / sizeof(itens_menu[0]);
+    int inicio_y = ALTURA / 2 - num_itens;
+    for (int i = 0; i < num_itens; ++i) {
+      int inicio_x = (LARGURA - strlen(itens_menu[i])) / 2;
+      for (int j = 0; j < strlen(itens_menu[i]); ++j){
+        desenha_caractere(inicio_x + j, inicio_y + i, itens_menu[i][j]);
       }
       screenUpdate();
     }
@@ -392,12 +404,12 @@ void menu(){
     screenUpdate();
     if (keyhit()){
       int ch = readch();
-      if (ch == '1'){
+      if (ch == '1') {
         break; // Começar o jogo
-      } else if (ch == '2'){
-        view_ranking();
-      } else if (ch == '3'){
-        acaba();
+      }else if (ch == '2'){
+        ver_ranking();
+      }else if (ch == '3'){
+        finaliza();
         exit(0);
       }
     }

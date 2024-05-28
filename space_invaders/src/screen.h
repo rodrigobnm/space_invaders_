@@ -161,6 +161,4 @@ void screenGotoxy(int x, int y);
  */
 void screenSetColor(screenColor fg, screenColor bg);
 
-void draw_char(int x, int y, char character);
-
 #endif /* __SCREEN_H__ */

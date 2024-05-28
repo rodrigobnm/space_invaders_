@@ -76,7 +76,3 @@ void screenSetColor(screenColor fg, screenColor bg) {
 
   printf("%s%s%d;%dm", ESC, atr, fg + 30, bg + 40);
 }
-void draw_char(int x, int y, char character) {
-  screenGotoxy(x, y); // Move o cursor para a posição (x, y)
-  putchar(character); // Desenha o caractere
-}
