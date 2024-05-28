@@ -8,7 +8,7 @@ Space Invaders é um clássico jogo de arcade lançado em 1978, onde os jogadore
 
 ## 🎲 Objetivo do Jogo
 
-O objetivo de Space Invaders é controlar uma nave espacial e destruir ondas de alienígenas que descem gradualmente em direção à Terra. O jogador deve atirar nos invasores antes que eles alcancem o solo, evitando os projéteis inimigos. A cada onda eliminada, a velocidade e dificuldade aumentam, testando a habilidade e reflexos do jogador.
+O objetivo de Space Invaders é controlar uma nave espacial e destruir ondas de alienígenas. O jogador deve atirar nos invasores, evitando os projéteis inimigos. Testando a habilidade e reflexos do jogador.
 
 ### 👾 NavexAlien:
 
