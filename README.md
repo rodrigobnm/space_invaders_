@@ -26,7 +26,7 @@ Elimine todos os inimigos para ganhar a partida!
    ```sh
    https://github.com/rodrigobnm/space_invaders_
    ```
-2. Navegue até o dirétorio correto:
+2. Navegue até o  diretório correto:
     ```sh
    cd space_invaders
    ```
