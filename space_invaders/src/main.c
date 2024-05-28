@@ -87,6 +87,7 @@ int main(){
 
 // Funções do Código:
 
+// Função de inicialização dos elemtnos e do jogo em si
 void initialize(Player **player, Enemy **enemies, Projectile **playerProjectiles, Projectile **enemyProjectiles){
 
   *player = (Player *)malloc(sizeof(Player));
@@ -110,6 +111,7 @@ void initialize(Player **player, Enemy **enemies, Projectile **playerProjectiles
   lastEnemyMoveTime = time(NULL);
 }
 
+// Função de GAME OVER caso jogador seja derrotado
 void draw_game_over(){
 
   screenInit(1);
@@ -123,6 +125,7 @@ void draw_game_over(){
   }
 }
 
+// Função para mensagem de Vitória após jogador eliminar todos inimigos
 void draw_victory_message(){
 
   screenInit(1);
@@ -136,6 +139,7 @@ void draw_victory_message(){
   }
 }
 
+// Função para desenhar a pontuação no topo da tela
 void draw_score(){
 
   char score_str[40];
@@ -148,6 +152,7 @@ void draw_score(){
   }
 }
 
+// Função para definição do formato dos elementos
 void desenho(Player player, Enemy enemies[], Projectile playerProjectiles[], Projectile enemyProjectiles[]){
 
   screenClear();
@@ -174,8 +179,9 @@ void desenho(Player player, Enemy enemies[], Projectile playerProjectiles[], Pro
   screenUpdate();
 }
 
+// Função para salvar a pontuação dos jogadores no arquivo .txt
 void save_score(){
-  
+
   FILE *file = fopen("scores.txt", "a");
   if (file){
     fprintf(file, "Player: %s, Score: %d\n", playerName, score);
@@ -185,6 +191,7 @@ void save_score(){
   }
 }
 
+// Função para atualização de informações na tela
 void atualiza(Player *player, Enemy enemies[], Projectile playerProjectiles[], Projectile enemyProjectiles[]){
 
   int allEnemiesDead = 1; // Variável para verificar se todos os inimigos estão mortos
@@ -283,12 +290,14 @@ void atualiza(Player *player, Enemy enemies[], Projectile playerProjectiles[], P
   }
 }
 
+// Função para finalizar jogo
 void acaba(){
   keyboardDestroy();
   timerDestroy();
   screenDestroy();
 }
 
+// Função para salvar nickname do jogador
 void get_player_name(){
   const char *message = "Digite seu nome: ";
   int message_length = strlen(message);
@@ -321,6 +330,7 @@ void get_player_name(){
   }
 }
 
+// Função para verificar o score de jogadores na tela
 void view_ranking(){
   while (1){
     screenClear();
@@ -362,6 +372,7 @@ void view_ranking(){
   }
 }
 
+// Função para mostrar menu na tela
 void menu(){
   while (1){
     screenClear();
