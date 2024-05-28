@@ -1,11 +1,9 @@
-enum {
-    KEY_ESC = 27,
-    KEY_ENTER = 13,
-    ARROW_UP = 256 + 72,
-    ARROW_DOWN = 256 + 80,
-    ARROW_LEFT = 256 + 75,
-    ARROW_RIGHT = 256 + 77
-};
+/**
+ * keyboard.h
+ * Created on Aug, 23th 2023
+ * Author: Tiago Barros
+ * Based on "From C to C++ course - 2002"
+*/
 
 #include <termios.h>
 #include <unistd.h>
@@ -15,8 +13,10 @@ enum {
 static struct termios initialSettings, newSettings;
 static int peekCharacter;
 
-void keyboardInit() {
-    tcgetattr(0, &initialSettings);
+
+void keyboardInit()
+{
+    tcgetattr(0,&initialSettings);
     newSettings = initialSettings;
     newSettings.c_lflag &= ~ICANON;
     newSettings.c_lflag &= ~ECHO;
@@ -26,22 +26,26 @@ void keyboardInit() {
     tcsetattr(0, TCSANOW, &newSettings);
 }
 
-void keyboardDestroy() { tcsetattr(0, TCSANOW, &initialSettings); }
+void keyboardDestroy()
+{
+    tcsetattr(0, TCSANOW, &initialSettings);
+}
 
-int keyhit() {
+int keyhit()
+{
     unsigned char ch;
     int nread;
 
-    if (peekCharacter != -1)
-        return 1;
+    if (peekCharacter != -1) return 1;
 
-    newSettings.c_cc[VMIN] = 0;
+    newSettings.c_cc[VMIN]=0;
     tcsetattr(0, TCSANOW, &newSettings);
-    nread = read(0, &ch, 1);
-    newSettings.c_cc[VMIN] = 1;
+    nread = read(0,&ch,1);
+    newSettings.c_cc[VMIN]=1;
     tcsetattr(0, TCSANOW, &newSettings);
 
-    if (nread == 1) {
+    if(nread > 0) 
+    {
         peekCharacter = ch;
         return 1;
     }
@@ -49,14 +53,16 @@ int keyhit() {
     return 0;
 }
 
-int readch() {
+int readch()
+{
     char ch;
 
-    if (peekCharacter != -1) {
+    if(peekCharacter != -1)
+    {
         ch = peekCharacter;
         peekCharacter = -1;
         return ch;
     }
-    read(0, &ch, 1);
+    read(0,&ch,1);
     return ch;
 }
