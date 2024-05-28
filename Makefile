@@ -1,16 +1,22 @@
-all: main
+CC = gcc
+CFLAGS = -Wall -Wextra -pthread -g
+LDFLAGS = -lm
 
-CC = clang
-override CFLAGS += -g -Wno-everything -pthread -lm
+SRCDIR = src
+SRCFILES = $(wildcard $(SRCDIR)/*.c)
+OBJFILES = $(SRCFILES:.c=.o)
 
-SRCS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.c' -print)
-HEADERS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.h' -print)
+EXECUTABLE = projeto
 
-main: $(SRCS) $(HEADERS)
-	$(CC) $(CFLAGS) $(SRCS) -o "$@"
+VPATH = $(SRCDIR)
 
-main-debug: $(SRCS) $(HEADERS)
-	$(CC) $(CFLAGS) -O0 $(SRCS) -o "$@"
+all: $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJFILES)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f main main-debug
+	rm -f $(OBJFILES) $(EXECUTABLE)

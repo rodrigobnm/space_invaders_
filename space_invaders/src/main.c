@@ -38,8 +38,8 @@ int enemyProjectileMoveCounter = 0;
 int enemyDirection = 1;
 time_t lastEnemyMoveTime = 0;
 
-void initialize(Player **player, Enemy **enemies, Projectile **playerProjectiles,
-                Projectile **enemyProjectiles) {
+void initialize(Player **player, Enemy **enemies,
+                Projectile **playerProjectiles, Projectile **enemyProjectiles) {
   *player = (Player *)malloc(sizeof(Player));
   (*player)->pos.x = WIDTH / 2;
   (*player)->pos.y = HEIGHT - 3;
@@ -52,8 +52,10 @@ void initialize(Player **player, Enemy **enemies, Projectile **playerProjectiles
     (*enemies)[i].alive = 1;
   }
 
-  *playerProjectiles = (Projectile *)malloc(MAX_PROJECTILES * sizeof(Projectile));
-  *enemyProjectiles = (Projectile *)malloc(MAX_PROJECTILES * sizeof(Projectile));
+  *playerProjectiles =
+      (Projectile *)malloc(MAX_PROJECTILES * sizeof(Projectile));
+  *enemyProjectiles =
+      (Projectile *)malloc(MAX_PROJECTILES * sizeof(Projectile));
 
   for (int i = 0; i < MAX_PROJECTILES; ++i) {
     (*playerProjectiles)[i].active = 0;
