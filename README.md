@@ -21,18 +21,21 @@ Elimine todos os inimigos para ganhar a partida!
 
 ## ♟️ Executando o Jogo
 
-Para executar o Space Invaders, siga estas etapas:
 
 1. Clone este repositório em sua máquina:
-   `Lorem Ipsum has been the industry's standard`
+   <a href="https://github.com/rodrigobnm/space_invaders_"></a>
 
-3. Compile o programa:
-   `Lorem Ipsum has been the industry's standard`
+2. Navegue até o dirétorio correto:
+   cd space_invaders
+
+3. Use o comando make para compilar o jogo:
+   make
+   O comando make usa o Makefile para automatizar o processo de compilação, compilando todos os arquivos necessários e criando o executável do jogo.
 
 4. Rode o programa:
-   `Lorem Ipsum has been the industry's standardn`
+   ./projeto
 
-5. Divirta-se jogando Pong2 com seus amigos!
+5. Divirta-se jogando Space Invaders com seus amigos!
 
 ## 👩‍💻 Membros
 
