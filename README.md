@@ -23,8 +23,9 @@ Elimine todos os inimigos para ganhar a partida!
 
 
 1. Clone este repositório em sua máquina:
-   <a href="https://github.com/rodrigobnm/space_invaders_">Link para repositório.</a>
-
+   ```sh
+   https://github.com/rodrigobnm/space_invaders_
+   ```
 2. Navegue até o dirétorio correto:
     ```sh
    cd space_invaders
