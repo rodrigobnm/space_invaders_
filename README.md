@@ -26,15 +26,19 @@ Elimine todos os inimigos para ganhar a partida!
    <a href="https://github.com/rodrigobnm/space_invaders_">Link para repositório.</a>
 
 2. Navegue até o dirétorio correto:
+    ```sh
    cd space_invaders
-
+   ```
 3. Use o comando make para compilar o jogo:
+   ```sh
    make
+   ```
    O comando make usa o Makefile para automatizar o processo de compilação, compilando todos os arquivos necessários e criando o executável do jogo.
 
 4. Rode o programa:
+    ```sh
    ./projeto
-
+   ```
 5. Divirta-se jogando Space Invaders com seus amigos!
 
 ## 👩‍💻 Membros
