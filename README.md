@@ -80,9 +80,7 @@ Para executar o Space Invaders, siga estas etapas:
   </tr>
 </table>
 -->
-## Licença
 
-Lorem Ipsum has been the industry's standard
 
 
 
